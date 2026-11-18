@@ -17,20 +17,26 @@ final class NavigationBar extends HorizontalScrollView {
     private String current;
     private final String[] routes={"recent","movie","series","variety","anime","search","history"};
     private final int[] labels={R.string.recent,R.string.movies,R.string.series,R.string.variety,R.string.anime,R.string.search,R.string.history};
+    // Compact glyph prefixes give the flat text tabs a TV-style icon affordance without adding assets.
+    private final String[] icons={"●","▶","▤","✦","✿","⌕","◷"};
 
     NavigationBar(Activity activity,String current,Listener listener) {
         super(activity);this.activity=activity;this.current=current;this.listener=listener;
         setHorizontalScrollBarEnabled(false);setClipToPadding(false);setClipChildren(false);
         buttons=new LinearLayout(activity);buttons.setGravity(Gravity.CENTER_VERTICAL);
         buttons.setPadding(dp(12),dp(4),dp(12),dp(4));addView(buttons);
+        android.content.res.ColorStateList navText=new android.content.res.ColorStateList(
+                new int[][]{new int[]{android.R.attr.state_focused},new int[]{android.R.attr.state_selected},new int[]{}},
+                new int[]{Color.rgb(24,20,10),Color.rgb(246,168,0),Color.rgb(224,224,224)});
         for(int i=0;i<routes.length;i++) {
             final String route=routes[i];Button button=new Button(activity);
             button.setId(View.generateViewId());
-            button.setTag(route);button.setText(labels[i]);button.setTextColor(Color.WHITE);button.setTextSize(14);
+            button.setTag(route);button.setText(activity.getString(R.string.nav_tab,icons[i],activity.getString(labels[i])));
+            button.setTextColor(navText);button.setTextSize(15);button.setTypeface(android.graphics.Typeface.DEFAULT_BOLD);
             button.setAllCaps(false);button.setGravity(Gravity.CENTER);button.setMinWidth(0);button.setMinHeight(0);
-            button.setMinimumWidth(0);button.setMinimumHeight(0);button.setPadding(dp(18),0,dp(18),0);
-            button.setFocusable(true);button.setFocusableInTouchMode(false);button.setBackgroundResource(R.drawable.focus_button);
-            LinearLayout.LayoutParams params=new LinearLayout.LayoutParams(-2,dp(40));params.setMargins(0,0,dp(8),0);
+            button.setMinimumWidth(0);button.setMinimumHeight(0);button.setPadding(dp(16),0,dp(16),0);
+            button.setFocusable(true);button.setFocusableInTouchMode(false);button.setBackgroundResource(R.drawable.nav_button);
+            LinearLayout.LayoutParams params=new LinearLayout.LayoutParams(-2,dp(38));params.setMargins(0,0,dp(8),0);
             buttons.addView(button,params);
             Runnable activate=()->{if(button.hasFocus()&&activity.hasWindowFocus()&&!activity.isFinishing()&&!activity.isDestroyed()&&!this.current.equals(route))listener.open(route);};
             button.setOnFocusChangeListener((view,focused)->{
